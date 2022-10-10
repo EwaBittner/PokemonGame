@@ -1,6 +1,10 @@
 const pokeAPIBaseUrl = "https://pokeapi.co/api/v2/pokemon/";
 const game = document.getElementById('game');
 
+let isPaused = false;
+let firstPick;
+let matches;
+
 const colors = {
 	fire: '#FDDFDF',
 	grass: '#DEFDE0',
@@ -52,8 +56,39 @@ const displayPokemon = (pokemon) => {
 const clickCard = (event) => {
     const pokemonCard = event.currentTarget;
     const [front, back] = getFrontAndBackFromCard(pokemonCard);
-    front.classList.toggle('rotated');
-    back.classList.toggle('rotated');
+
+    if(front.classList.contains("rotated") || isPaused) return;
+
+    isPaused = true;
+
+    rotateElements([front, back])
+    if(!firstPick) {
+        firstPick = pokemonCard;
+        isPaused = false;
+    } else {
+        const secondPokemonName = pokemonCard.dataset.pokename;
+        const firstPokemonName = firstPick.dataset.pokename;
+        if(firstPokemonName != secondPokemonName) {
+            const [firstFront, firstBack] = getFrontAndBackFromCard(firstPick);
+            setTimeout(() => {
+                rotateElements([front, back, firstFront, firstBack]);
+                firstPick = null;
+                isPaused = false;
+            }, 500)
+        }else {
+            matches ++;
+            if(matches === 8){
+                console.log("Winner");
+            }
+            firstPick = null;
+            isPaused = false;
+        }
+    }
+}
+
+const rotateElements = (elements) => {
+    if(typeof elements !== 'object' || !elements.length) return;
+    elements.forEach(element => element.classList.toggle('rotated'));
 }
 
 const getFrontAndBackFromCard = (card) => {
@@ -62,9 +97,18 @@ const getFrontAndBackFromCard = (card) => {
     return [front, back]
 }
 
-const resetGame = async () => {
+const resetGame = async() => {
     const pokemon = await loadPokemon();
     displayPokemon([...pokemon, ...pokemon]);
+    game.innerHTML = '';
+    isPaused = true;
+    firstPick = null;
+    matches = 0;
+    setTimeout(async() => {
+        const pokemon = await loadPokemon();
+        displayPokemon([...pokemon, ...pokemon]);
+        isPaused = false;
+    }, 200)
 }
 
 resetGame();

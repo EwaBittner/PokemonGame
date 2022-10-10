@@ -48,6 +48,11 @@ header {
     transition: transform 0.5s;
 }
 
+.back>h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
 .front {
     background-image: url(/pokeball.png);
     background-position: center;
@@ -57,4 +62,18 @@ header {
 
 .rotated {
     transform: rotateY(180deg);
+}
+
+button {
+    font-size:18px;
+    background-color: #c62828;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+button:hover {
+
 }
